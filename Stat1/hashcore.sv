@@ -108,3 +108,34 @@ module sha256_hash_core (
     assign H_o = h;
 
 endmodule
+
+
+
+
+module rotr(
+        input x, n, w,
+        output rotrght
+        );
+
+assign rotrght = (x >> n) | (x << (w-n));
+
+endmodule
+
+
+module choose( 
+        input x,y,z,
+        output ch
+        );
+
+assign kk = (x & y) ^ ((~x) & z);
+
+endmodule 
+
+module majority(
+            input x, y, z,
+            output maj
+            );
+          
+assign maj = (x & y) ^ (x & z) ^ (y & z);
+
+endmodule
