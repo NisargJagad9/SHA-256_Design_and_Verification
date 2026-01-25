@@ -1,4 +1,3 @@
-//A different approach to our Hashcore logic code
 module hashcore(
     input logic clk,
     input logic rst_n,
@@ -22,12 +21,69 @@ module hashcore(
 logic [31:0] a, b, c, d, e, f, g, h;
 logic [5:0]  round_cnt;  // counts 0..63
 
-function automatic logic [31:0] ch(input logic [31:0] x,
-                                    input logic [31:0] y,
-                                    input logic [31:0] z);
+//SHA uses different nonlinear functions in different paths so that the state evolution is not biased toward a single type of logic behavior.
+//Ch introduces selector-style dependency, while Maj introduces consensus-style dependency.
+//Together, they prevent structural patterns and improve diffusion across rounds.
 
+//CHOICE FUNCTION          ch(x,y,z) → nonlinear selector
+//If x=1, we get y.
+//If x=0, we get z.
+
+function automatic logic [31:0] ch(
+        input logic [31:0] x,
+        input logic [31:0] y,
+        input logic [31:0] z
+        );
+    
     ch = (x & y) ^ (~x & z);
 
 endfunction
     
+//MAJORITY FUNCTION            maj(x,y,z) → nonlinear voting
+function automatic logic [31:0] Maj(
+        input logic [31:0] x,
+        input logic [31:0] y,
+        input logic [31:0] z
+);
+
+    Maj = (x & y)^(x & z)^(y & z);
+
+endfunction
+
+//Rotate is just wiring, no logic cost.
+//rotr(x,n) → bit diffusion primitive
+function automatic logic [31:0] rotr(
+        input logic [31:0] x,
+        input int unsigned n
+
+);
+
+    rotr = (x >> n | x << (32-n));
+
+endfunction
+
+//This is a diffusion function.
+//big_sigma_0(x) → state diffusion
+//big_sigma_1(x) → state diffusion
+function automatic logic [31:0] big_sigma_0(
+        input logic [31:0] x
+);
+
+    big_sigma_0 = rotr(x,2) ^ rotr(x,13) ^ rotr(x,22);
+
+endfunction
+
+function automatic logic [31:0] big_sigma_1(
+        input logic [31:0] x
+);
+
+    big_sigma_1 = rotr(x,6) ^ rotr(x,11) ^ rotr(x,25);
+
+endfunction
+
+logic [31:0] T1, T2;
+
+assign T1 = h + big_sigma_1(e) + ch(e,f,g) + Kt_i + Wt_i;
+assign T2 = big_sigma_0(a) + Maj(a,b,c);
+
 endmodule
