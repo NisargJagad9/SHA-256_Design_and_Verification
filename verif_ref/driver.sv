@@ -1,13 +1,13 @@
 `include "uvm_macros.svh"
-import uvm_pkg::*
-`include "sha256_seq_item.sv";
-`include "hash_core.sv";
-`include "sha256_rom.sv";
+import uvm_pkg::*;
+import sha256_reference_pkg::*;
 
 class sha256_driver extends uvm_driver #(sha256_seq_item);
     virtual hash256 vif;
     
-    function new (string name = "sha256_driver",uvm_component parent);
+    `uvm_component_utils(sha256_driver)
+    
+    function new (string name = "sha256_driver",uvm_component parent=null);
         super.new(name,parent);
     endfunction
     
@@ -22,9 +22,9 @@ class sha256_driver extends uvm_driver #(sha256_seq_item);
                 
              for ( int i=0;i<64;i++)begin
              
-                vif.Kt_i <= K[t];
+                vif.Kt_i <= K[i];
                 
-                vif.Wt_i <= schedule_word(tr.block,t);
+                vif.Wt_i <= schedule_word(tr.block,i);
                 @(posedge vif.clk);
               end
               
@@ -32,6 +32,10 @@ class sha256_driver extends uvm_driver #(sha256_seq_item);
              end
          endtask
    endclass
+              
+              
+              
+              
               
               
               
