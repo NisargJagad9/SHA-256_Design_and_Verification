@@ -44,7 +44,7 @@ begin
     begin
         for(integer i = 0; i <64 ; i++)  block_bytes[i]<=8'b0;
         length <= 'b0;
-        valid <= 'b0;
+        valid_o <= 'b0;
         M_o <= 'b0;
         write_ptr <= 'b0;
         send_count <= 'b0;
