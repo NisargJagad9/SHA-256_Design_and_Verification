@@ -29,7 +29,7 @@ logic [5:0]  round_cnt;  // counts 0..63
 //If x=1, we get y.
 //If x=0, we get z.
 
-function automatic logic [31:0] ch(
+function automatic logic [31:0] Ch(
         input logic [31:0] x,
         input logic [31:0] y,
         input logic [31:0] z
@@ -58,7 +58,7 @@ function automatic logic [31:0] rotr(
 
 );
 
-    rotr = (x >> n | x << (32-n));
+    rotr = (x >> n | (x << (32-n)));
 
 endfunction
 
@@ -81,9 +81,77 @@ function automatic logic [31:0] big_sigma_1(
 
 endfunction
 
+
 logic [31:0] T1, T2;
 
-assign T1 = h + big_sigma_1(e) + ch(e,f,g) + Kt_i + Wt_i;
+//One path that pulls in the message
+//message + constant + some internal bits
+assign T1 = h + big_sigma_1(e) + Ch(e,f,g) + Kt_i + Wt_i;
+
+//One path that scrambles existing state
+//scrambles internal state
 assign T2 = big_sigma_0(a) + Maj(a,b,c);
+
+
+//Every cycle, deeply change a and e, shift the rest.
+//Only a and e directly absorb new computed complexity each round.
+//The rest still get affected indirectly because they receive previous values of a and e over subsequent rounds.
+
+always_ff @(posedge clk or negedge rst_n)
+begin
+    if(!rst_n)
+        begin
+            a <= 32'd0;
+            b <= 32'd0;
+            c <= 32'd0;
+            d <= 32'd0;
+            e <= 32'd0;
+            f <= 32'd0;
+            g <= 32'd0;
+            h <= 32'd0;
+            done <= 1'b0;
+            round_cnt <= 6'd0;
+        end
+    else if(load)
+        begin
+            a <= A_i;
+            b <= B_i;
+            c <= C_i;
+            d <= D_i;
+            e <= E_i;
+            f <= F_i;
+            g <= G_i;
+            h <= H_i;
+            round_cnt <= 6'd0;
+            done <= 1'b0;
+        end
+    else if(!done)
+        begin
+            h <= g ;
+            g <= f ;
+            f <= e ; 
+            d <= c ;
+            c <= b ;
+            b <= a ;
+            e <= d + T1 ;
+            a <= T1 + T2 ;
+            round_cnt <= round_cnt +1 ;
+            
+            if(round_cnt == 63)
+                done <= 1'b1;
+        end
+
+end
+
+assign A_o = a;
+assign B_o = b;
+assign C_o = c;
+assign D_o = d;
+assign E_o = e;
+assign F_o = f;
+assign G_o = g;
+assign H_o = h;
+
+assign finall = {A_o, B_o, C_o, D_o, E_o, F_o, G_o, H_o};
 
 endmodule
