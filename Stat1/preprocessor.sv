@@ -54,23 +54,34 @@ begin
     begin
         case(state)
            RECV : begin
+                  valid_o <= 0;
+                  M_o <= 0;
                     if(data_valid)
-                     if(byte_valid!=0)
-                        for(integer i = 0; i < 16; i++) begin
-                            if(i < byte_valid) begin
-                                block_bytes[write_ptr + i] <= data_in[127-(i*8)-:8];
+                            begin
+                                if(byte_valid!=0) 
+                                begin
+                                    for(integer i = 0; i < 16; i++) 
+                                    begin
+                                        if(i < byte_valid) 
+                                        begin
+                                        block_bytes[write_ptr + i] <= data_in[127-(i*8)-:8];
+                                        end
+                                write_ptr <= write_ptr + byte_valid;
+                                length <= length + (byte_valid*8);
+                                end
                             end
+                        else
+                        begin
+                                
+                                state <= PAD;
                         end
-                    else
-                        write_ptr <= write_ptr + byte_valid;
-                        length <= length + (byte_valid*8);
-
-                        state <= PAD;
+                        end
+                    
                     end
            PAD  :  begin : pad
                      block_bytes[write_ptr] <= 8'h80;  //Adds 1 to the end of the data
-                     {block_bytes[63],block_bytes[62],block_bytes[61],block_bytes[60],
-                      block_bytes[59],block_bytes[58],block_bytes[57],block_bytes[56]} <= length; //Adding length to 63:0 of block
+                     {block_bytes[56],block_bytes[57],block_bytes[58],block_bytes[59],
+                      block_bytes[60],block_bytes[61],block_bytes[62],block_bytes[63]} <= length; //Adding length to 63:0 of block
                       state <= SEND; 
                    end
            SEND :  begin
@@ -80,13 +91,13 @@ begin
                       if(send_count==15) begin
                         state <= RECV;
                         send_count <= 0;
-                        valid_o <= 0;
+                        
                         write_ptr <= 0;
                         length <= 0;
                       end
                       else
                       begin
-                        send_count = send_count + 1;
+                        send_count <= send_count + 1;
                       end
                    end
             default : state <= RECV;           
