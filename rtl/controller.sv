@@ -135,3 +135,116 @@ module sha256_ctrl_fsm (
     end
 
 endmodule
+
+
+//trialllll
+`timescale 1ns / 1ps
+
+module sha256_controller (
+    input  logic        clk,
+    input  logic        rst_n,
+
+    // Control input
+    input  logic        msg_valid,   //asserted when new 512-bit block is ready
+
+    // Outputs to datapath
+    output logic        d_valid,            // goes to hash_core
+    output logic        scheduler_en,            // enable message scheduler
+    output logic [5:0]  round_idx,           // 0 to 63, for Wt and Kt
+    output logic        hash_done            // indicates final hash is valid
+);
+
+    // ------------------------------------------------------------
+    // FSM state encoding
+    // ------------------------------------------------------------
+    typedef enum logic [1:0] {
+        IDLE,
+        LOAD,
+        COMPRESS,
+        DONE
+    } state_t;
+
+    state_t state, next_state;
+
+    // ------------------------------------------------------------
+    // Round counter (shared by scheduler + ROM)
+    // ------------------------------------------------------------
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            round_idx <= 6'd0;
+        else if (state == LOAD)
+            round_idx <= 6'd0;
+        else if (state == COMPRESS)
+            round_idx <= round_idx + 6'd1;
+    end
+
+    // ------------------------------------------------------------
+    // FSM state register
+    // ------------------------------------------------------------
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+
+    // ------------------------------------------------------------
+    // FSM next-state logic
+    // ------------------------------------------------------------
+    always_comb begin
+        next_state = state;
+
+        case (state)
+            IDLE: begin
+                if (msg_valid)
+                    next_state = LOAD;
+            end
+
+            LOAD: begin
+                next_state = COMPRESS;
+            end
+
+            COMPRESS: begin
+                if (round_idx == 6'd63)
+                    next_state = DONE;
+            end
+
+            DONE: begin
+                next_state = IDLE;
+            end
+
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // ------------------------------------------------------------
+    // Output logic
+    // ------------------------------------------------------------
+    always_comb begin
+        // Default outputs
+        d_valid   = 1'b0;
+        scheduler_en  = 1'b0;
+        hash_done = 1'b0;
+
+        case (state)
+            IDLE: begin
+                // nothing active
+            end
+
+            LOAD: begin
+                d_valid  = 1'b1;   // pulse to load initial hash values
+                scheduler_en = 1'b1;   // prepare scheduler
+            end
+
+            COMPRESS: begin
+                scheduler_en = 1'b1;   // scheduler + ROM active
+            end
+
+            DONE: begin
+                hash_done = 1'b1;  // final hash is valid
+            end
+        endcase
+    end
+
+endmodule
+
