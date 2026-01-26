@@ -35,7 +35,7 @@ function automatic logic [31:0] Ch(
         input logic [31:0] z
         );
     
-    ch = (x & y) ^ (~x & z);
+    Ch = (x & y) ^ (~x & z);
 
 endfunction
     
@@ -58,7 +58,7 @@ function automatic logic [31:0] rotr(
 
 );
 
-    rotr = (x >> n | (x << (32-n)));
+    rotr = (x >> n )| (x << (32-n));
 
 endfunction
 
