@@ -18,7 +18,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module preprocessor (
+module preproc (
     input logic         rst,
     input logic         clk,
     input logic         data_valid,
