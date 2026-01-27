@@ -157,4 +157,4 @@ def _rotate_right(num: int, shift: int, size: int = 32):
     return (num >> shift) | (num << size - shift)
 
 if __name__ == "__main__":
-    print(generate_hash("Hello").hex())
+    print(generate_hash("shravani").hex())
