@@ -1,0 +1,75 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Engineer: Nisarg and Shravani
+// 
+// Create Date: 01/25/2026 11:58:34 PM
+// Design Name: 
+// Module Name: tb_preproc
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+//  For testing the working of Preprocessor 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module tb_preproc;
+
+bit           rst;
+bit           clk;
+logic         data_valid;
+logic [127:0] data_in;  
+logic [3:0]   byte_valid;
+logic         valid_o;
+logic [31:0]  M_o;
+logic [31:0]  W_o;
+logic         W_dv;
+
+//DUT instantiation
+preprocessor PP (.*);
+
+msg_sch MS(clk,rst,M_o,valid_o,W_o,W_dv);
+
+
+
+
+//clk signal
+initial forever #5 clk = ~clk;
+
+//Sequence 
+initial begin
+//rst sequence 
+rst = 1;
+#10;
+rst = 0;
+#10;
+rst = 1;
+
+//Data Sequence
+data_valid = 1'b1;
+data_in = 128'h7368_7261_7661_6E69_0000_0000_0000_0000;
+byte_valid = 4'd8;
+#10;
+byte_valid = 4'd0; //End of data
+#10;
+data_valid = 1'b0;
+end
+
+initial begin
+
+#30;
+
+end
+
+
+
+
+
+endmodule
+
