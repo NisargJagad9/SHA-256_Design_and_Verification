@@ -64,7 +64,7 @@ begin
                                     begin
                                         if(i < byte_valid) 
                                         begin
-                                        block_bytes[write_ptr + i] <= data_in[127-(i*8)-:8];
+                                            block_bytes[write_ptr + i] <= data_in[439-(i*8)-:8];
                                         end
                                 write_ptr <= write_ptr + byte_valid;
                                 length <= length + (byte_valid*8);
