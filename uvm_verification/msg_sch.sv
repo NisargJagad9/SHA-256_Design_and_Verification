@@ -55,12 +55,9 @@ module msg_sch(
                     W_reg[i] <= W_reg[i+1];
                 end
                 
-                // Load the NEW calculated value into the top of the buffer
                 W_reg[15] <= w_next;
                 W_o       <= w_next;
                 W_dv      <= 1'b1;
-
-                // Termination
                 if (W_count == 63) begin
                     W_count <= '0; // Reset for next block
                 end else begin
