@@ -28,7 +28,7 @@ module top (
     // Final output
     output logic        hash_done,
     output logic [255:0] fin_hash,
-    output logic  [6:0] round_idx_o
+    output logic  [6:0] round_idx_of
 );
 
     // ------------------------------------------------------------
