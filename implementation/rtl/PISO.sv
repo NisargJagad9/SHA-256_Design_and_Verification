@@ -3,11 +3,11 @@ module piso (
     input  logic       clk,
     input  logic       rst_n,
 
-    // From your hash module
+    // From the hash module
     input  logic       hash_done,           // 1-cycle pulse when hash is ready
     input  logic [255:0] fin_hash,          // 256-bit hash to transmit
 
-    // To your UART TX module
+    // To the UART TX module
     output logic       tx_dv,               // pulse to start sending one byte
     output logic [7:0] tx_byte,             // byte to send
     input  logic       tx_done,             // from UART TX - high for 1 cycle when byte sent
