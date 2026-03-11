@@ -1,8 +1,14 @@
-# CDAC_Final_Project
-Final project and its references/resources
+# SHA 256 Verilog Design and Verification
 
-Stat1 folder contains the design files written in sv.
+RTL folder contains the following design files -
+
+top.sv
+    preprocessor.sv
+    msg_scheduler.sv
+    sha_functions.svh
+    hashcore.sv
 
 
+Block Diagram of RTL
+[img/rtl_block_diagram.png]
 
-https://opencores.org/usercontent/img/1468893218
