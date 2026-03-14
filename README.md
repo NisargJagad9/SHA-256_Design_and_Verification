@@ -51,8 +51,8 @@ We implemented a **pipelined iterative** (choose one) architecture:
 - Message scheduler (W[t]) computed on-the-fly
 -
 **Block diagram** 
-
-    ![Block Diagram](img/rtl_block_diagram.png)
+![Block_diagram](img/rtl_block_diagram.png)
+  
 
 
 # SHA-256 Design and Verification
@@ -72,7 +72,7 @@ SHA-256-Design-and-Verification/
 ├── fpga/                         # FPGA-specific files
 ├── docs/                         # Documentation, diagrams, reports
 └── results/                      # Output logs, utilization reports, etc.
-
+```
 
 
 Main modules:
